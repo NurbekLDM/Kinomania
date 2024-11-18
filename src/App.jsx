@@ -11,6 +11,7 @@ import '@nextui-org/react'
 import FilmsPage from "./pages/films.jsx";
 import SerialInfo from './pages/serialsInfo.jsx'
 import SerialsPage from "./pages/serials.jsx";
+import { Analytics } from "@vercel/analytics/react"
 
 import {CircularProgress} from "@nextui-org/react";
 import TrailersPage from "./pages/trailers.jsx";
@@ -53,7 +54,7 @@ function ScrollToTop() {
 
 function App() {
 
-  const [value, setValue] = React.useState(0);
+  const [ setValue] = React.useState(0);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -63,6 +64,7 @@ function App() {
   }, []);
 
   return (
+      <Analytics>
       <FavoritesProvider>
     <Suspense fallback={<div className="bg-white text-3xl flex items-center content-center gap-2" style={{textAlign: 'center', marginTop: '20%', justifyContent: 'center'}}>Loading <CircularProgress size="sm" aria-label="Loading..." /></div>}>
         <LazyComponent/>
@@ -71,6 +73,7 @@ function App() {
         </RouterProvider>
     </Suspense>
       </FavoritesProvider>
+      </Analytics>
 );
 }
 
