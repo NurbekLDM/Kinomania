@@ -11,7 +11,7 @@ import '@nextui-org/react'
 import FilmsPage from "./pages/films.jsx";
 import SerialInfo from './pages/serialsInfo.jsx'
 import SerialsPage from "./pages/serials.jsx";
-import { Analytics } from "@vercel/analytics/react"
+
 
 import {CircularProgress} from "@nextui-org/react";
 import TrailersPage from "./pages/trailers.jsx";
@@ -53,28 +53,37 @@ function ScrollToTop() {
 }
 
 function App() {
+    const [value, setValue] = React.useState(0); // Correctly destructuring state and updater function
 
-  const [ setValue] = React.useState(0);
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setValue((v) => (v >= 100 ? 0 : v + 10));
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setValue((v) => (v >= 100 ? 0 : v + 10));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+    return (
 
-  return (
-      <Analytics>
-      <FavoritesProvider>
-    <Suspense fallback={<div className="bg-white text-3xl flex items-center content-center gap-2" style={{textAlign: 'center', marginTop: '20%', justifyContent: 'center'}}>Loading <CircularProgress size="sm" aria-label="Loading..." /></div>}>
-        <LazyComponent/>
-        <RouterProvider router={router}>
-          <ScrollToTop />
-        </RouterProvider>
-    </Suspense>
-      </FavoritesProvider>
-      </Analytics>
-);
+            <FavoritesProvider>
+                <Suspense
+                    fallback={
+                        <div
+                            className="bg-white text-3xl flex items-center content-center gap-2"
+                            style={{ textAlign: "center", marginTop: "20%", justifyContent: "center" }}
+                        >
+                            Loading <CircularProgress size="sm" aria-label="Loading..." />
+                        </div>
+                    }
+                >
+                    <LazyComponent />
+                    <RouterProvider router={router}>
+                        <ScrollToTop />
+                    </RouterProvider>
+                </Suspense>
+            </FavoritesProvider>
+
+    );
 }
+
 
 export default App
