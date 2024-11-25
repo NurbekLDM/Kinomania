@@ -1,5 +1,5 @@
 import {Input} from "@nextui-org/react";
-
+import {useSearch} from "../context/searchContext.jsx";
 const SearchIcon = (props) => (
     <svg
         aria-hidden="true"
@@ -29,12 +29,20 @@ const SearchIcon = (props) => (
 );
 
 export default function Search() {
+
+    const { searchQuery, setSearchQuery } = useSearch();
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
     return (
         <div style={{marginLeft: "80px", width: "800px", marginTop: 0,height: "fit-content"}} className=" rounded-2xl flex justify-center items-center text-white shadow-lg">
             <Input
                 style={{paddingBottom: "5px", paddingLeft: "15px"}}
                 isClearable
                 radius="lg"
+                value={searchQuery}
+                onChange={handleSearchChange}
                 classNames={{
                     label: "text-black/50 dark:text-white/90",
                     input: [

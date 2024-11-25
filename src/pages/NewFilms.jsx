@@ -6,13 +6,18 @@ import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import Filter from "../components/filter.jsx";
 import { useFavorites } from "../context/favouritesContext.jsx";
 import films from "../data/filmsdata.jsx";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
+import { useSearch } from "../context/searchContext.jsx";
 
 export default function NewFilms() {
     const [isSortedDescending, setIsSortedDescending] = useState(true);
     const [selectedGenres, setSelectedGenres] = useState(new Set());
     const [selectedCountry, setSelectedCountry] = useState(null);
-    const [filteredMovies, setFilteredMovies] = useState([]); 
+    const [filteredMovies, setFilteredMovies] = useState([]);
+
+    const { searchQuery } = useSearch();
+    const { favorites, addToFavorites } = useFavorites();
+    const navigate = useNavigate();
 
     const handleGenreChange = (genres) => {
         setSelectedGenres(genres);
@@ -24,9 +29,9 @@ export default function NewFilms() {
 
         const sorted = [...filteredMovies].sort((a, b) => {
             if (newSortOrder) {
-                return b.rating - a.rating; 
+                return b.rating - a.rating;
             } else {
-                return a.rating - b.rating; 
+                return a.rating - b.rating;
             }
         });
 
@@ -38,16 +43,20 @@ export default function NewFilms() {
     };
 
     useEffect(() => {
-        const filtered = films.filter(movie => {
-            const genreMatch = selectedGenres.size === 0 || [...selectedGenres].some(genre => movie.genre.includes(genre));
-            const countryMatch = !selectedCountry || movie.countries.includes(selectedCountry);
-            return genreMatch && countryMatch;
+
+        const filtered = films.filter((movie) => {
+            const genreMatch =
+                selectedGenres.size === 0 ||
+                [...selectedGenres].some((genre) => movie.genre.includes(genre));
+            const countryMatch =
+                !selectedCountry || movie.countries.includes(selectedCountry);
+            const searchMatch = movie.title
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase());
+            return genreMatch && countryMatch && searchMatch;
         });
         setFilteredMovies(filtered);
-    }, [selectedGenres, selectedCountry]);
-
-    const { favorites, addToFavorites } = useFavorites();
-    const navigate = useNavigate();
+    }, [selectedGenres, selectedCountry, searchQuery]);
 
     const handleCardClick = (title) => {
         navigate(`/filmInfo/${title}`);
@@ -59,26 +68,23 @@ export default function NewFilms() {
 
     return (
         <div>
-            <Filter 
-             onGenreChange={handleGenreChange}
-             onCountryChange={handleCountryChange}
-             onRatingSort={handleRatingSort}
+            <Filter
+                onGenreChange={handleGenreChange}
+                onCountryChange={handleCountryChange}
+                onRatingSort={handleRatingSort}
             />
             <div className="mt-3 flex flex-row flex-wrap gap-2">
-                {films.filter(film => film.year === 2019 && 2018).map((film, index) => (
+                {filteredMovies.map((film, index) => (
                     <Card
-                        style={{ width: 240, height: 400, backgroundColor: '#373636' }}
+                        style={{ width: 240, height: 400, backgroundColor: "#373636" }}
                         shadow="sm"
                         key={index}
                         isPressable
                         onClick={() => handleCardClick(film.title)}
->
-                        <CardBody
-                            className="overflow-visible p-0"
-
-                        >
+                    >
+                        <CardBody className="overflow-visible p-0">
                             <Image
-                                style={{ border: 'none', borderRadius: 'none' }}
+                                style={{ border: "none", borderRadius: "none" }}
                                 width={240}
                                 height={300}
                                 alt={film.title}
@@ -94,7 +100,10 @@ export default function NewFilms() {
                                     <p className="text-default-400 text-small">{film.genre}</p>
                                 </p>
                                 <div className="flex items-center mt-2">
-                                    <p style={{ color: 'yellow' }} className="flex items-center text-small">
+                                    <p
+                                        style={{ color: "yellow" }}
+                                        className="flex items-center text-small"
+                                    >
                                         <StarIcon style={{ height: 16 }} /> {film.grade}
                                     </p>
                                     <p className="ml-2 text-default-400">{film.year}</p>
@@ -105,10 +114,10 @@ export default function NewFilms() {
                                         }}
                                         style={{ marginLeft: 120 }}
                                     >
-                                        {favorites.some(fav => fav.title === film.title) ? (
-                                            <HeartIconSolid style={{ height: 24, color: 'red' }} />
+                                        {favorites.some((fav) => fav.title === film.title) ? (
+                                            <HeartIconSolid style={{ height: 24, color: "red" }} />
                                         ) : (
-                                            <HeartIconOutline style={{ height: 24, color: 'gray' }} />
+                                            <HeartIconOutline style={{ height: 24, color: "gray" }} />
                                         )}
                                     </button>
                                 </div>

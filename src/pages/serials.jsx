@@ -6,9 +6,11 @@ import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import Filter from "../components/filter.jsx";
 import { useFavorites } from "../context/favouritesContext.jsx";
 import serials from "../data/serials.jsx";
+import { useSearch } from "../context/searchContext.jsx";
 
 export default function SerialsPage() {
     const { favorites, addToFavorites } = useFavorites();
+    const { searchQuery } = useSearch();
     const navigate = useNavigate();
 
     const handleCardClick = (title, e) => {
@@ -20,17 +22,22 @@ export default function SerialsPage() {
         addToFavorites(serial);
     };
 
+
+    const filteredSerials = serials.filter((serial) =>
+        serial.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div>
             <Filter />
             <div className="mt-3 flex flex-row flex-wrap gap-2">
-                {serials.map((serial, index) => (
+                {filteredSerials.map((serial, index) => (
                     <Card
                         style={{ width: 240, height: 400, backgroundColor: '#373636' }}
                         shadow="sm"
                         key={index}
                         isPressable
-                        onClick={(e) => handleCardClick(serial.title,e)}
+                        onClick={(e) => handleCardClick(serial.title, e)}
                     >
                         <CardBody
                             className="overflow-visible p-0"
@@ -42,7 +49,7 @@ export default function SerialsPage() {
                                 height={300}
                                 alt={serial.title}
                                 className="w-full object-cover"
-                            
+                                src={serial.img} // Tasvir URL'i qo'shildi
                             />
                         </CardBody>
 

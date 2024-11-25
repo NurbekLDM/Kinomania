@@ -27,7 +27,7 @@ export default function MenuBar() {
               }}
               aria-label="Actions"
           >
-              <ListboxItem  style={{
+              <ListboxItem as={Link} to="/"  style={{
                   paddingLeft: "20px",paddingTop: "10px", height: 'fit-content', cursor: 'default',
                   background: 'transparent',
                   pointerEvents: 'none',transition: 'none',
@@ -35,7 +35,8 @@ export default function MenuBar() {
                       background: 'transparent',
                       color: 'inherit'}}}
                             key="brand">
-                   <h1 style={{fontSize: "40px"}}><Link to="/" >KinoMania</Link></h1>
+
+                   <h1  style={{fontSize: "40px"}}>KinoMania</h1>
               </ListboxItem>
               <ListboxItem as={Link} to="newfilms" startContent={<FilmIcon className="w-5 h-5 text-gray-500" />} style={{ marginTop: "40px" }} className="hover:bg-gray-200" key="new_films">
                   New films

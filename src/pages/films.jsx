@@ -1,77 +1,40 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+import { useSearch } from "../context/searchContext.jsx";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
-import Filter from "../components/filter.jsx";
-import { useFavorites } from "../context/favouritesContext.jsx";
 import films from "../data/filmsdata.jsx";
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
+import { useFavorites } from "../context/favouritesContext.jsx";
 
 export default function Films() {
-    const [isSortedDescending, setIsSortedDescending] = useState(true);
-    const [selectedGenres, setSelectedGenres] = useState(new Set());
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const [filteredMovies, setFilteredMovies] = useState([]); 
+    const { searchQuery } = useSearch();
+    const [filteredMovies, setFilteredMovies] = useState([]);
 
-    const { favorites, addToFavorites } = useFavorites();
     const navigate = useNavigate();
-
-    const handleGenreChange = (genres) => {
-        setSelectedGenres(genres);
-    };
-
-    const handleRatingSort = () => {
-        const newSortOrder = !isSortedDescending;
-        setIsSortedDescending(newSortOrder);
-
-        const sorted = [...filteredMovies].sort((a, b) => {
-            if (newSortOrder) {
-                return b.rating - a.rating; 
-            } else {
-                return a.rating - b.rating; 
-            }
-        });
-
-        setFilteredMovies(sorted);
-    };
-
-    const handleCountryChange = (country) => {
-        setSelectedCountry(country);
-    };
-
-    useEffect(() => {
-        const filtered = films.filter(movie => {
-            const genreMatch = selectedGenres.size === 0 || [...selectedGenres].some(genre => movie.genre.includes(genre));
-            const countryMatch = !selectedCountry || movie.countries.includes(selectedCountry);
-            return genreMatch && countryMatch;
-        });
-        setFilteredMovies(filtered);
-    }, [selectedGenres, selectedCountry]);
-    
-    const randomFilms = useMemo(() => {
-        const shuffled = [...films].sort(() => 0.5 - Math.random());
-        return shuffled;
-    }, []);
-
-    const handleCardClick = (title) => {
-        navigate(`/filmInfo/${title}`);
-    };
+    const { favorites, addToFavorites } = useFavorites();
 
     const handleClick = (film) => {
         addToFavorites(film);
     };
 
+    useEffect(() => {
+        const filtered = films.filter((movie) =>
+            movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredMovies(filtered);
+    }, [searchQuery]);
+
+    const handleCardClick = (title) => {
+        navigate(`/filmInfo/${title}`);
+    };
+
     return (
         <div>
-            <Filter
-                onGenreChange={handleGenreChange}
-                onCountryChange={handleCountryChange}
-                onRatingSort={handleRatingSort}
-            />
             <div className="mt-3 flex flex-row flex-wrap gap-2">
-                {filteredMovies.length > 0 ? ( 
-                    randomFilms.map((film, index) => (
+                {filteredMovies.length > 0 ? (
+                    filteredMovies.map((film, index) => (
                         <Card
                             style={{ width: 240, height: 400, backgroundColor: '#373636' }}
                             shadow="sm"
@@ -122,7 +85,7 @@ export default function Films() {
                         </Card>
                     ))
                 ) : (
-                    <p className="text-white">No films match the selected filters.</p>
+                    <p className="text-white">No films match your search.</p>
                 )}
             </div>
             <Outlet />

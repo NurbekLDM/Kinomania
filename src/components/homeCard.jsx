@@ -3,7 +3,7 @@ import picture from '/pic.jpg'
 import {CardHeader, CardBody} from "@nextui-org/react";
 import { Link } from "react-router-dom";
 import trailers from '../data/trailers'
-import { tr } from "framer-motion/client";
+
 
 export default function HomeCard() {
     return (
